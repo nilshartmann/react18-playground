@@ -1,0 +1,114 @@
+import React, { useTransition } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+
+function buildProducts() {
+  const p: string[] = [];
+  for (let i = 0; i < 20000; i++) {
+    p.push("Product " + i);
+  }
+  return p;
+}
+
+const allProducts = buildProducts();
+
+function filterProducts(filter: string) {
+  return allProducts.filter((p) => p.includes(filter));
+}
+
+function App() {
+  const [filter, setFilter] = React.useState("2");
+  const [input, setInput] = React.useState("2");
+  const [pending, startTransition] = useTransition();
+  const [no, setNo] = React.useState(0);
+
+  React.useEffect(() => {
+    setInterval(() => {
+      setNo(getRandomInt(100000));
+    }, 1);
+  }, []);
+
+  // const filteredProducts = filter ? filterProducts(filter) : allProducts;
+
+  console.log("App filter", filter, " input", input);
+
+  function onFilterChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+
+    // setFilter(value); // lower prio
+    // setInput(value); // immediately
+    setInput(value); // immediately
+
+    // startTransition(() => {
+    //   setFilter(e.target.value); // lower prio
+    // });
+  }
+
+  return (
+    <div className="App">
+      <input type="text" value={input} onChange={onFilterChange} />
+      <p>
+        Filter <code>{filter}</code>, input <code>{input}</code>, pending:{" "}
+        {pending.toString()}
+      </p>
+      {pending && <p>List will be rebuilt!</p>}
+      <p>Number: {no}</p>
+      <Chart no={no} />
+      {/* <ProductList products={[]} /> */}
+    </div>
+  );
+}
+
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}
+
+let x = false;
+
+const Chart = React.memo(function Chart({ no }: { no: number }) {
+  React.useEffect(() => {
+    x = !x;
+  });
+  return (
+    <div>
+      Number: {no}
+      {x && (
+        <ul>
+          <li>a</li>
+          <li>a</li>
+          <li>a</li>
+          <li>a</li>
+        </ul>
+      )}
+      {x || (
+        <div>
+          <p>Eins</p>
+          <p>ZWei</p>
+          <p>Drei</p>
+          <p>vie</p>
+        </div>
+      )}
+    </div>
+  );
+});
+
+function ProductList({ products }: { products: string[] }) {
+  const [no, setNo] = React.useState(0);
+
+  React.useEffect(() => {
+    setInterval(() => {
+      setNo(getRandomInt(100000));
+    }, 100);
+  }, []);
+
+  return (
+    <p>Number: {no}</p>
+    // <ul>
+    //   {products.map((p) => (
+    //     <li key={p}>{p}</li>
+    //   ))}
+    // </ul>
+  );
+}
+
+export default App;
